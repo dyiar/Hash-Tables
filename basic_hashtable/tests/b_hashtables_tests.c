@@ -7,7 +7,7 @@ char *basic_hash_table_test()
 
     char *return_value = hash_table_retrieve(ht, "key-0");
     mu_assert(return_value == NULL, "Initialized value is not NULL");
-    /*
+    
     hash_table_insert(ht, "key-0", "val-0");
     return_value = hash_table_retrieve(ht, "key-0");
     mu_assert(strcmp(return_value, "val-0") == 0, "Value is not stored correctly");
@@ -19,7 +19,7 @@ char *basic_hash_table_test()
     hash_table_remove(ht, "key-0");
     return_value = hash_table_retrieve(ht, "key-0");
     mu_assert(return_value == NULL, "Deleted value is not NULL");
-    */
+    
 
     return NULL;
 }

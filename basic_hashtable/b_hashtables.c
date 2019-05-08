@@ -76,12 +76,12 @@ BasicHashTable *create_hash_table(int capacity)
     return NULL;
   }
 
-  ht = calloc(capacity, sizeof(BasicHashTable));
+  ht = malloc(sizeof(BasicHashTable));
   if (ht == NULL) {
     return NULL;
   }
 
-  ht -> storage = (Pair**)calloc(capacity, sizeof(Pair));
+  ht -> storage = calloc(capacity, sizeof(Pair *));
   if (ht->storage == NULL) {
     return (NULL);
   }
@@ -100,30 +100,21 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  // if (ht->key != NULL) {
-  //   printf("Warning, you are overwriting the previous key value pair");
-  //   ht->key[value] = value;
-  // }
-  // ht->key = value;
 
-  Pair *node;
+  Pair *node = create_pair(key, value);
 
   if (ht == NULL) {
     return;
   }
-
-  node = malloc(sizeof(Pair));
   if (node == NULL) {
     return;
   }
-
-  node-> key = strdup(key);
-  node-> value = strdup(value);
   
   unsigned int i = hash(node->key, ht->capacity);
 
   if (ht->storage[i] != NULL) {
     printf("Value is being overwritten");
+    destroy_pair(ht->storage[i]);
     ht->storage[i] = node;
   }
   else{
@@ -177,20 +168,21 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
   i = hash(key, ht->capacity);
   tmp = ht->storage[i];
 
-  for (int j = 0; j<ht->capacity; i++) {
-    if (strcmp(tmp->key, key_cp) == 0) {
+
+  if (ht->storage[i] != NULL && strcmp(tmp->key, key_cp) == 0) {
       free(key_cp);
       return tmp->value;
-    }
   }
+  
 
   free(key_cp);
   if(tmp == NULL) {
     return NULL;
   }
-
   return tmp->value;
 }
+
+
 
 /****
   Fill this in.
@@ -207,7 +199,7 @@ void destroy_hash_table(BasicHashTable *ht)
 
   for (i = 0; i < ht->capacity; i++) {
     if (ht->storage[i] != NULL) {
-      free(ht->storage[i]);
+      destroy_pair(ht->storage[i]);
     }
   }
   free(ht->storage);
