@@ -72,6 +72,22 @@ BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht;
 
+  if (capacity < 1) {
+    return NULL;
+  }
+
+  ht = malloc(sizeof(BasicHashTable));
+  if (ht == NULL) {
+    return NULL;
+  }
+
+  ht -> storage = calloc(capacity, sizeof(Pair *));
+  if (ht->storage == NULL) {
+    return (NULL);
+  }
+
+  ht->capacity=capacity;
+
   return ht;
 }
 
@@ -85,6 +101,28 @@ BasicHashTable *create_hash_table(int capacity)
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
 
+  Pair *node = create_pair(key, value);
+
+  if (ht == NULL) {
+    return;
+  }
+  if (node == NULL) {
+    return;
+  }
+  
+  unsigned int i = hash(node->key, ht->capacity);
+
+  if (ht->storage[i] != NULL) {
+    printf("Value is being overwritten");
+    destroy_pair(ht->storage[i]);
+    ht->storage[i] = node;
+  }
+  else{
+  
+  ht->storage[i] = node;
+  }
+  return;
+
 }
 
 /****
@@ -94,6 +132,20 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  unsigned int i;
+
+
+  if (ht == NULL) {
+    return;
+  }
+
+  i = hash(key, ht->capacity);
+
+    if (ht->storage[i] != NULL){
+      destroy_pair(ht->storage[i]);
+      ht->storage[i] = NULL;
+  }
+
 
 }
 
@@ -104,8 +156,33 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  char *key_cp;
+  unsigned int i;
+  Pair *tmp;
+
+  if (ht == NULL) {
+    return NULL;
+  }
+
+  key_cp = strdup(key);
+  i = hash(key, ht->capacity);
+  tmp = ht->storage[i];
+
+
+  if (ht->storage[i] != NULL && strcmp(tmp->key, key_cp) == 0) {
+      free(key_cp);
+      return tmp->value;
+  }
+  
+
+  free(key_cp);
+  if(tmp == NULL) {
+    return NULL;
+  }
+  return tmp->value;
 }
+
+
 
 /****
   Fill this in.
@@ -114,7 +191,19 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  int i;
 
+  if(ht == NULL) {
+    return;
+  }
+
+  for (i = 0; i < ht->capacity; i++) {
+    if (ht->storage[i] != NULL) {
+      destroy_pair(ht->storage[i]);
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
@@ -134,6 +223,7 @@ int main(void)
   } else {
     fprintf(stderr, "ERROR: STILL HERE\n");
   }
+  
 
   destroy_hash_table(ht);
 
